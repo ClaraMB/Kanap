@@ -1,18 +1,29 @@
 
 var cartContent = [];
+var currentKanap = {
+    id: id,
+    color: color,
+    quantity: Number(quantity),
+    price: data.price,
+    imageUrl: imgUrl,
+    altTxt: altText,
+    name: kanap.name
+};
 
 cartContent = retrieveKanap() ? retrieveKanap() : []
 console.log(cartContent)
 cartContent.forEach((kanap) => {
-    fetch("http://localhost:3000/api/products/" + kanap.id) // Appel à l'API pour récupérer le detail du canape
-    .then(function(res) { // Réponse du backend sous format json
-        return res.json(); // Retour du backend 
-    })
-    .then((response) => {
-        displayKanap(kanap,response);
-    });  
+    getKanap(kanap.id)
+    displayKanap(kanap,currentKanap)
 })
 
+fetch("http://localhost:3000/api/products/" + id) // Appel à l'API pour récupérer l'image
+.then(function(res) { // Réponse du backend sous format json
+      return res.json(); // Retour du backend 
+})
+.then((currentKanap) => {
+    data(currentKanap);
+});
 
 // Fonction pour récupérer le contenu du panier et le convertir en objet
 function retrieveKanap() {
@@ -29,8 +40,9 @@ function displayKanap(kanap,currentKanap){
     const div = createImageDiv(currentKanap)
     article.appendChild(div)
     
-    const cartItemContent = createCartContent(kanap, currentKanap)
+    const cartItemContent = createCartContent(kanap)
     article.appendChild(cartItemContent)
+    displayArticle(article)
 }
 
 // Fonction pour créer la balise "article"
@@ -54,10 +66,10 @@ function createImageDiv(currentKanap){
 }
 
 // Fonction pour créer la balise cart__item__content
-function createCartContent(kanap, currentKanap){
+function createCartContent(kanap){
     const cartItemContent = document.createElement("div")
     cartItemContent.classList.add("cart__item__content")
-    const description = createDescription(kanap, currentKanap)
+    const description = createDescription(kanap)
     const settings = createSettings(kanap) 
     
     cartItemContent.appendChild(description)
@@ -66,19 +78,20 @@ function createCartContent(kanap, currentKanap){
 }
 
 // Création de la balise cart__item__content__description
-function createDescription(kanap, currentKanap) {
+function createDescription(kanap) {
     const description = document.createElement("div")
     description.classList.add("cart__item__content__description")
     // Création de la balise h2 pour le nom du produit
     const h2 = document.createElement("h2")
-    h2.textContent = currentKanap.name
+    h2.textContent = kanap.name
     // Création de la balise p pour la couleur
     const pColor = document.createElement("p")
     pColor.textContent = kanap.color
     // Création de la balise p pour le prix
     const pPrice = document.createElement("p")
-    pPrice.textContent = currentKanap.price + " €"
+    pPrice.textContent = kanap.price + " €"
     
+    div.appendChild(description)
     description.appendChild(h2)
     description.appendChild(pColor)
     description.appendChild(pPrice)
@@ -92,17 +105,16 @@ function createSettings(kanap){
 
     quantitySettings(settings, kanap)
     quantityDelete(settings)
-    return settings
+    return "settings"
 }
 
-function quantityDelete(settings){ 
+function quantityDelete(settings)
     const div = document.createElement("div")
     div.classList.add("cart__item__content__settings__delete")
     const pDelete = document.createElement("p")
     pDelete.textContent = "Supprimer"
     div.appendChild(pDelete)
     settings.appendChild(div)
-}
 
 function quantitySettings(settings, kanap){
     const quantity = document.createElement("div")
