@@ -41,20 +41,42 @@ const button = document.querySelector("#addToCart")
         let dataProducts = {
             id: id,
             color: null,
-            quantity: null
+            quantity: null,
         }
         const color = document.querySelector("#colors").value
         const quantity = document.querySelector("#quantity").value
         // Si color est = à null ou vide ou bien quantity = null ou vide alors affiche le message
-        if (color === "" || color == null || quantity == 0 || quantity == null) {
-        alert ("Veuillez sélectionner une couleur et une quantité")}
+        if (color === "" || color == null || quantity == 0 || quantity == null || quantity >= 101) {
+        alert ("Veuillez sélectionner une couleur et une quantité entre 1 et 100 svp")}
         else {
             dataProducts.color = color; 
             dataProducts.quantity = quantity ;
-
+            
             var cart = JSON.parse(localStorage.getItem('cart')); 
-            const cartContent = cart ? [...cart, dataProducts] : [dataProducts]   
-            localStorage.setItem('cart', JSON.stringify(cartContent))
+
+// puis on vérifie si le produit existe déjà dans le LS
+    // on vérifie avec .find() si l'id et la couleur d'un article sont déjà présents
+    let kanap = cart?.find(
+        (kanap) => kanap.id == dataProducts.id && kanap.color == dataProducts.color
+    );
+
+    // SI OUI > on ajoute la nouvelle quantité à l'ancienne
+    if (kanap) {
+        const newQuantity = +kanap.quantity + +dataProducts.quantity;
+        dataProducts.quantity = JSON.stringify(newQuantity);
+        alert("La quantité du produit a bien été mise à jour.");
+        // et on réassigne kanap.quantity 
+        kanap.quantity = newQuantity;
+
+        const cartContent = cart.length > 0 ? cart : [dataProducts]
+        localStorage.setItem('cart', JSON.stringify(cartContent));
+    }
+else{
+     // si le produit n'existe pas déjà dans le LS on le push
+     const cartContent = cart?.length > 0 ? [...cart, dataProducts] : [dataProducts]   
+     localStorage.setItem('cart', JSON.stringify(cartContent))
 }
+        }
 })
+
 
