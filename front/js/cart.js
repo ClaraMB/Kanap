@@ -49,7 +49,7 @@ function displayTotalPrice(kanap){
     const totalPrice = document.querySelector("#totalPrice")
     cartContent.forEach((priceKanap) => {
         const totalUnitPrice = kanap.price * priceKanap.quantity
-        total += totalUnitPrice
+        total += parseInt(totalUnitPrice)
     })
     totalPrice.textContent = total
 }
@@ -59,7 +59,6 @@ function changePriceAndQuantity(id, newQuantity, priceKanap){
     const dataToUpdate = cartContent.find((kanap) => kanap.id === id)
     dataToUpdate.quantity = newQuantity
     displayTotalQuantity(priceKanap)
-    console.log(priceKanap)
     displayTotalPrice(priceKanap)
 }
 
@@ -150,7 +149,6 @@ function deleteKanap(kanap){
     //Alerte produit supprimé
     alert("Ce produit a bien été supprimé du panier");
     document.location.reload();
-    console.log(cartContent)
 }
 
 function quantitySettings(settings, kanap){
@@ -172,3 +170,127 @@ function quantitySettings(settings, kanap){
     settings.appendChild(quantity)
 }
 
+// FORMULAIRE
+
+// sélectionner le bouton valider et écoute du clic sur ce bouton
+const orderButton = document.querySelector(".cart__order__form")
+
+const validationForm = {
+    firstName: {
+        element: document.getElementById("firstName"),
+        regex: /^[A-Za-z][A-Za-z\é\è\ê\ë\ï\œ\-\s]+$/,
+        errorMsg: "Prénom invalide"
+    },
+    lastName: {
+        element: document.getElementById("lastName"),
+        regex: /^[A-Za-z][A-Za-z\é\è\ê\ë\ï\œ\-\s]+$/,
+        errorMsg: "Nom invalide"
+    },
+    address: {
+        element: document.getElementById("address"),
+        regex: /^[#.0-9a-zA-ZÀ-ÿ\s,-]{2,60}$/,
+        errorMsg: "Adresse invalide"
+    },
+    city: {
+        element: document.getElementById("city"),
+        regex: /^[A-Za-z][A-Za-z\é\è\ê\ë\ï\œ\-\s]+$/,
+        errorMsg: "Ville invalide"
+    },
+    email: {
+        element: document.getElementById('email'),
+        regex: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,
+        errorMsg: "Email invalide"
+    }
+};
+
+const firstNameInput = document.getElementById("firstName");
+firstNameInput.addEventListener("change", () => checkInput(validationForm.firstName));
+
+const lastNameInput = document.getElementById("lastName");
+lastNameInput.addEventListener("change", () => checkInput(validationForm.lastName));
+
+const addressInput = document.getElementById("address");
+addressInput.addEventListener("change", () => checkInput(validationForm.address));
+
+const cityInput = document.getElementById("city");
+cityInput.addEventListener("change", () => checkInput(validationForm.city));
+
+const emailInput = document.getElementById("email");
+emailInput.addEventListener("change", () => checkInput(validationForm.email));
+
+function checkInput(input) {
+    const inputElement = input.element;
+    const inputRegex = input.regex;
+    const errorMsg = input.errorMsg;
+    const errorDiv = input.element.nextElementSibling;
+    const isRegexValid = inputRegex.test(inputElement.value);
+
+    if (isRegexValid) {
+        errorDiv.innerText = "";
+    } else {
+        errorDiv.innerText = errorMsg;
+    }
+    return isRegexValid;
+}
+
+orderButton.addEventListener("click", (e) => submitForm(e));
+
+function submitForm(e) {
+    e.preventDefault() // pour éviter que la page se recharge au clic
+    if (cartContent.length === 0) // si le panier est vide affiche ce message d'erreur
+    alert("Votre panier est vide, veuillez sélectionner des articles.")
+
+    let contact = {
+        firstName: firstNameInput.value,
+        lastName: lastNameInput.value,
+        address: addressInput.value,
+        city: cityInput.value,
+        email: emailInput.value
+    };
+
+    if (
+        checkInput(validationForm.firstName) == false &&
+        checkInput(validationForm.lastName) == false &&
+        checkInput(validationForm.address) == false &&
+        checkInput(validationForm.city) == false &&
+        checkInput(validationForm.email) == false
+        ){
+        alert("Le formulaire est incorrect.");
+    }
+    if (
+        cartContent.length > 0 &&
+        checkInput(validationForm.firstName) &&
+        checkInput(validationForm.lastName) &&
+        checkInput(validationForm.address) &&
+        checkInput(validationForm.city) &&
+        checkInput(validationForm.email)
+        ){
+        // on enregistre le formulaire dans le LS
+        localStorage.setItem("contact", JSON.stringify(contact));
+        // on appelle la fonction qui envoie les données au serveur
+        sendToServer();
+    }
+
+// Fonction qui envoie les données au serveur avec méthode POST
+
+function sendToServer() {
+    fetch("http://localhost:3000/api/products/order", {
+        method: "POST",
+        headers: {
+        "Content-Type": "application/json",
+    },
+      body: JSON.stringify({contact, cartContent}), // clefs contact et products
+    })
+      // on récupère et stock la réponse de l'API (orderId)
+    .then((response) => {
+        return response.json();
+    })
+    .then((server) => {
+        const orderId = server.orderId;
+        // si orderId n'est pas undefined on redirige l'utilisateur vers la page confirmation
+        if (orderId != undefined) {
+            location.href = 'confirmation.html?id=' + orderId;
+        }
+    });
+}
+};
