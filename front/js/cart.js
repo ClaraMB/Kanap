@@ -1,4 +1,3 @@
-
 // on crée un tableau pour récupérer les ID de chaque produit du panier
 var cartContent = [];
 
@@ -87,7 +86,7 @@ function createCartContent(kanap, priceKanap){
     const cartItemContent = document.createElement("div")
     cartItemContent.classList.add("cart__item__content")
     const description = createDescription(kanap, priceKanap)
-    const settings = createSettings(kanap) 
+    const settings = createSettings(kanap, priceKanap) 
     
     cartItemContent.appendChild(description)
     cartItemContent.appendChild(settings)
@@ -115,11 +114,11 @@ function createDescription(kanap, priceKanap) {
     }
 
 // Fonction pour créer la balise cart__item__content__settings avec les blocs Quantity et Delete
-function createSettings(kanap){
+function createSettings(kanap, priceKanap){
     const settings = document.createElement("div")
     settings.classList.add("cart__item__content__settings")
 
-    quantitySettings(settings, kanap)
+    quantitySettings(settings, kanap, priceKanap)
     quantityDelete(settings, kanap)
     return settings
 }
@@ -151,7 +150,7 @@ function deleteKanap(kanap){
     document.location.reload();
 }
 
-function quantitySettings(settings, kanap){
+function quantitySettings(settings, kanap, priceKanap){
     const quantity = document.createElement("div")
     quantity.classList.add("cart__item__content__settings__quantity")
     const pQuantity = document.createElement("p")
@@ -164,7 +163,7 @@ function quantitySettings(settings, kanap){
     input.min = "1"
     input.max = "100"
     input.value = kanap.quantity
-    input.addEventListener('change', (priceKanap) => changePriceAndQuantity(kanap.id, input.value, priceKanap))
+    input.addEventListener('change', () => changePriceAndQuantity(kanap.id, input.value, priceKanap))
 
     quantity.appendChild(input)
     settings.appendChild(quantity)
@@ -173,7 +172,7 @@ function quantitySettings(settings, kanap){
 // FORMULAIRE
 
 // sélectionner le bouton valider et écoute du clic sur ce bouton
-const orderButton = document.querySelector(".cart__order__form")
+const orderButton = document.querySelector(".cart__order__form__submit")
 
 const validationForm = {
     firstName: {
@@ -248,6 +247,8 @@ function submitForm(e) {
         email: emailInput.value
     };
 
+    let products = cartContent.map(product => product.id)
+
     if (
         checkInput(validationForm.firstName) == false &&
         checkInput(validationForm.lastName) == false &&
@@ -279,7 +280,7 @@ function sendToServer() {
         headers: {
         "Content-Type": "application/json",
     },
-      body: JSON.stringify({contact, cartContent}), // clefs contact et products
+      body: JSON.stringify({contact, products}), // clefs contact et products
     })
       // on récupère et stock la réponse de l'API (orderId)
     .then((response) => {
@@ -289,7 +290,7 @@ function sendToServer() {
         const orderId = server.orderId;
         // si orderId n'est pas undefined on redirige l'utilisateur vers la page confirmation
         if (orderId != undefined) {
-            location.href = 'confirmation.html?id=' + orderId;
+            location.href = "confirmation.html?id=" + orderId;
         }
     });
 }
