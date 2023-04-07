@@ -33,7 +33,6 @@ function displayKanap(kanap, priceKanap){
     displayTotalPrice(priceKanap)
 }
 // Fonction pour faire le total du prix + le total de la quantité des articles
-
 function displayTotalQuantity(){
     let total = 0
     const totalQuantity = document.querySelector("#totalQuantity")
@@ -171,7 +170,7 @@ function quantitySettings(settings, kanap, priceKanap){
 
 // FORMULAIRE
 
-// sélectionner le bouton valider et écoute du clic sur ce bouton
+// sélectionner le bouton valider 
 const orderButton = document.querySelector(".cart__order__form__submit")
 
 const validationForm = {
@@ -232,6 +231,7 @@ function checkInput(input) {
     return isRegexValid;
 }
 
+// écoute du clic sur le bouton valider
 orderButton.addEventListener("click", (e) => submitForm(e));
 
 function submitForm(e) {
@@ -288,9 +288,10 @@ function sendToServer() {
     })
     .then((server) => {
         const orderId = server.orderId;
-        // si orderId n'est pas undefined on redirige l'utilisateur vers la page confirmation
+        // si orderId n'est pas undefined l'utilisateur est redirigé vers la page confirmation
         if (orderId != undefined) {
             location.href = "confirmation.html?id=" + orderId;
+            alert("Votre commande à bien été enregistrée");
         }
     });
 }

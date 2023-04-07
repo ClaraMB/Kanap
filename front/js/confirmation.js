@@ -10,7 +10,7 @@ const confirmationOrder = document.getElementById("orderId");
 
 // Fonction qui affiche le numéro de commande
 function displayOrderId() {
-    confirmationOrder.innerHTML = "</br>" + orderId;
+    confirmationOrder.innerHTML = "</br>" + orderId + "</br>Merci de votre commande !" ;
 
     //On vide le local storage
     localStorage.clear();

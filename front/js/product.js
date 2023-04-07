@@ -74,7 +74,8 @@ const button = document.querySelector("#addToCart")
 else{
      // si le produit n'existe pas déjà dans le LS on le push
     const cartContent = cart?.length > 0 ? [...cart, dataProducts] : [dataProducts]   
-    localStorage.setItem('cart', JSON.stringify(cartContent))
+    localStorage.setItem('cart', JSON.stringify(cartContent));
+    alert("Le produit a bien été ajouté au panier.")
 }
         }
 })
