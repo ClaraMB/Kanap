@@ -32,6 +32,7 @@ function displayKanap(kanap, priceKanap){
     displayTotalQuantity(priceKanap)
     displayTotalPrice(priceKanap)
 }
+
 // Fonction pour faire le total du prix + le total de la quantité des articles
 function displayTotalQuantity(){
     let total = 0
@@ -291,7 +292,7 @@ function sendToServer() {
         // si orderId n'est pas undefined l'utilisateur est redirigé vers la page confirmation
         if (orderId != undefined) {
             location.href = "confirmation.html?id=" + orderId;
-            alert("Votre commande à bien été enregistrée");
+            alert("Votre commande a bien été enregistrée");
         }
     });
 }

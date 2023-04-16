@@ -1,4 +1,6 @@
+// Appel à l'API pour récupérer l'image
 const searchParams = new URLSearchParams(window.location.search);
+// on peut récupérer la valeur d'une clé
 const id = searchParams.get('id');
 
 
